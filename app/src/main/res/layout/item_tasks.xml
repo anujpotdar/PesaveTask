@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:paddingBottom="3dp"
+    >
+
+    <android.support.v7.widget.CardView
+        android:elevation="@dimen/cardview_default_elevation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_marginTop="5dp"
+        android:text="transactionName"
+        android:textSize="15sp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/transactionTime"
+        android:id="@+id/transactionName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:text="amount"
+        android:textSize="15sp"
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/chillrAmount"
+        android:layout_alignParentRight="true"
+        android:id="@+id/transactionAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:text="chillr"
+        android:textSize="17sp"
+        android:layout_alignParentRight="true"
+        android:textStyle="bold"
+        android:id="@+id/chillrAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:text="Time"
+        android:textSize="17sp"
+        android:layout_alignParentLeft="true"
+        android:textStyle="bold"
+        android:id="@+id/transactionTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</RelativeLayout>
