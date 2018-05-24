@@ -5,6 +5,12 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Message {
+    public Message(String transactionName, String transactionAmount, String chillrAmount, String transactionTime) {
+        this.transactionName = transactionName;
+        this.transactionAmount = transactionAmount;
+        this.chillrAmount = chillrAmount;
+        this.transactionTime = transactionTime;
+    }
 
     @SerializedName("transactionName")
     @Expose

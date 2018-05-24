@@ -5,26 +5,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.anuj.potdar.pesavetask.databinding.ActivityMainBinding;
 import com.anuj.potdar.pesavetask.transaction.Message;
-import com.anuj.potdar.pesavetask.transaction.Response;
-import com.google.gson.GsonBuilder;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 public class MainActivity extends AppCompatActivity {
 
-    private APIInterface apiInterface = ServiceGenerator.createService(APIInterface.class,this);
     private ArrayList<Message> messages;
     private ActivityMainBinding binding;
     private TransactionAdapter adapter;
     private MainActivity activity;
+    private RequestQueue requestQueue;
+    private String url = "http://uat.pesave.com/apiv2/CronController/jsonTest";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,11 +36,13 @@ public class MainActivity extends AppCompatActivity {
 
         binding = DataBindingUtil.setContentView(this,R.layout.activity_main);
         activity = this;
-        apiInterface = ServiceGenerator.createService(APIInterface.class,this);
+        requestQueue = Volley.newRequestQueue(this);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
 
         binding.recyclerView.setLayoutManager(linearLayoutManager);
+
+        messages = new ArrayList<>();
 
         getData();
 
@@ -51,31 +57,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getData() {
+
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.buttonRetry.setVisibility(View.GONE);
         binding.errorMsg.setVisibility(View.GONE);
-        Call<Response> transactionsCall = apiInterface.getTransactionDetails();
-        transactionsCall.enqueue(new Callback<Response>() {
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
-                if(response != null){
-                    if(response.body()!=null){
-                        if(response.body().getStatus().equals("success")){
-                            binding.progressBar.setVisibility(View.GONE);
-                            messages = (ArrayList<Message>) response.body().getMessage();
-                            adapter = new TransactionAdapter(messages,activity);
-                            binding.recyclerView.setAdapter(adapter);
-                        }
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray jsonArray = response.getJSONArray("message");
+                    binding.progressBar.setVisibility(View.GONE);
+                    for(int i = 0; i < jsonArray.length(); i++){
+                        JSONObject message = jsonArray.getJSONObject(i);
+
+                        messages.add(new Message(message.getString("transactionName"),
+                                message.getString("transactionAmount"),
+                                message.getString("chillrAmount"),
+                                message.getString("transactionTime")));
                     }
+
+                    adapter = new TransactionAdapter(messages,activity);
+                    binding.recyclerView.setAdapter(adapter);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    binding.progressBar.setVisibility(View.GONE);
+                    binding.buttonRetry.setVisibility(View.VISIBLE);
+                    binding.errorMsg.setVisibility(View.VISIBLE);
                 }
             }
-
+        }, new com.android.volley.Response.ErrorListener() {
             @Override
-            public void onFailure(Call<Response> call, Throwable t) {
+            public void onErrorResponse(VolleyError error) {
                 binding.progressBar.setVisibility(View.GONE);
                 binding.buttonRetry.setVisibility(View.VISIBLE);
                 binding.errorMsg.setVisibility(View.VISIBLE);
             }
         });
+
+        requestQueue.add(jsonObjectRequest);
     }
+
 }
